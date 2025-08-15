@@ -60,7 +60,7 @@ jobs:
         targets: ${{ matrix.platform.target }}
 
     - name: Cache Cargo dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/.cargo/registry
@@ -99,7 +99,7 @@ jobs:
         Copy-Item "target/${{ matrix.platform.target }}/release/${{ matrix.platform.executable }}" "artifacts/${{ matrix.platform.name }}/"
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: svg-mcp-${{ matrix.platform.name }}
         path: artifacts/${{ matrix.platform.name }}/${{ matrix.platform.executable }}
@@ -135,7 +135,7 @@ jobs:
         git push origin ${{ inputs.version }}
       
     - name: Download all artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         path: dist
         
