@@ -18,7 +18,10 @@
     "jpeg",
     "rust"
   ],
-  "author": "lihongjie0209",
+  "author": {
+    "name": "lihongjie0209",
+    "url": "https://github.com/lihongjie0209"
+  },
   "license": "MIT",
   "repository": {
     "type": "git",
