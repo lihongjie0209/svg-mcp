@@ -14,19 +14,23 @@ npx svg-mcp
 
 ## How it Works
 
-When you install or run `svg-mcp` via npm:
+The `svg-mcp` npm package includes pre-compiled binaries for all supported platforms:
 
 1. **Platform Detection**: The package automatically detects your platform (Windows, macOS, Linux) and architecture (x64, ARM64)
-2. **Binary Download**: Downloads the appropriate pre-compiled binary from GitHub releases
-3. **Automatic Setup**: Places the executable in the correct location and sets up permissions
-4. **Ready to Use**: The MCP server is ready to run
+2. **Binary Selection**: Selects the appropriate pre-included binary for your platform
+3. **Ready to Use**: The MCP server runs immediately without any downloads
 
-## Supported Platforms
+## Included Binaries
 
-- ✅ **Windows x64** (MSVC build)
-- ✅ **Linux x64** 
-- ✅ **macOS Intel (x64)**
-- ✅ **macOS Apple Silicon (ARM64)**
+The npm package contains the following pre-compiled binaries:
+
+- ✅ **Windows x64 MSVC** (`svg-mcp-windows-x64.exe`)
+- ✅ **Windows x64 GNU** (`svg-mcp-windows-x64-gnu.exe`) - backup option
+- ✅ **Linux x64** (`svg-mcp-linux-x64`)
+- ✅ **macOS Intel x64** (`svg-mcp-macos-x64`)
+- ✅ **macOS Apple Silicon ARM64** (`svg-mcp-macos-arm64`)
+
+**Package Size**: ~25-30MB (includes all platform binaries)
 
 ## Configuration with Claude Desktop
 
@@ -58,20 +62,25 @@ Or if globally installed:
 
 ## Troubleshooting
 
-### Binary Download Failed
+### Unsupported Platform
 
-If the automatic download fails, you can:
+If you get a "Unsupported platform" error:
 
-1. **Manual Download**: Visit [GitHub Releases](https://github.com/lihongjie0209/svg-mcp/releases) and download manually
-2. **Extract**: Place the executable in `node_modules/svg-mcp/bin/`
-3. **Permissions**: On Unix systems, run `chmod +x node_modules/svg-mcp/bin/svg-mcp`
+1. **Check Platform Support**: Currently supported platforms are listed above
+2. **Build from Source**: See the main README for build instructions
+3. **Request Support**: Open an issue on GitHub for your platform
 
-### Platform Not Supported
+### Permission Issues (Unix Systems)
 
-Currently supported platforms are listed above. If your platform isn't supported:
+If you get permission denied errors on Linux/macOS:
 
-1. **Build from Source**: See the main README for build instructions
-2. **Request Support**: Open an issue on GitHub for your platform
+```bash
+# Check if binary has execute permissions
+ls -la node_modules/svg-mcp/bin/
+
+# If needed, fix permissions
+chmod +x node_modules/svg-mcp/bin/svg-mcp-*
+```
 
 ### Node.js Version
 
@@ -107,15 +116,13 @@ If you prefer to manage the binary yourself:
 2. Place in your preferred location
 3. Update Claude Desktop config to use the full path
 
-### Development/Testing
+### Package Size
 
-```bash
-# Clone the npm package
-npm pack svg-mcp
-tar -xzf svg-mcp-*.tgz
-cd package
-npm install
-```
+The npm package is relatively large (~25-30MB) because it includes binaries for all platforms. This ensures:
+
+- ✅ **Offline Installation**: Works without internet after download
+- ✅ **Fast Startup**: No runtime downloads or compilation
+- ✅ **Reliable**: No dependency on external download sources
 
 ## FAQ
 
@@ -123,10 +130,10 @@ npm install
 A: No, the npm package includes pre-compiled binaries.
 
 **Q: Will this work offline?**  
-A: After initial installation, yes. The binary is cached locally.
+A: Yes, all binaries are included in the package.
 
-**Q: How large is the download?**  
-A: Approximately 6-8MB depending on platform.
+**Q: Why is the package so large?**  
+A: It includes binaries for all supported platforms (~5-6MB each).
 
 **Q: Can I use this in CI/CD?**  
 A: Yes, `npx svg-mcp` works great in automated environments.

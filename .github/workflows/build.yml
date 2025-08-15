@@ -238,6 +238,59 @@ jobs:
           sleep 10
         done
         
+    - name: Download and prepare binaries for npm
+      run: |
+        # 创建bin目录
+        mkdir -p bin
+        
+        # 下载所有平台的二进制文件
+        RELEASE_TAG="v${{ steps.version.outputs.version }}"
+        BASE_URL="https://github.com/${{ github.repository }}/releases/download/$RELEASE_TAG"
+        
+        echo "Downloading binaries for npm package..."
+        
+        # Windows x64 MSVC
+        echo "Downloading Windows x64 MSVC..."
+        curl -L "$BASE_URL/svg-mcp-windows-x64.zip" -o windows-x64.zip
+        unzip windows-x64.zip
+        mv svg-mcp.exe bin/svg-mcp-windows-x64.exe
+        rm windows-x64.zip
+        
+        # Windows x64 GNU (备用)
+        echo "Downloading Windows x64 GNU..."
+        curl -L "$BASE_URL/svg-mcp-windows-x64-gnu.zip" -o windows-x64-gnu.zip
+        unzip windows-x64-gnu.zip
+        mv svg-mcp.exe bin/svg-mcp-windows-x64-gnu.exe
+        rm windows-x64-gnu.zip
+        
+        # Linux x64
+        echo "Downloading Linux x64..."
+        curl -L "$BASE_URL/svg-mcp-linux-x64.tar.gz" -o linux-x64.tar.gz
+        tar -xzf linux-x64.tar.gz
+        mv svg-mcp bin/svg-mcp-linux-x64
+        rm linux-x64.tar.gz
+        
+        # macOS x64
+        echo "Downloading macOS x64..."
+        curl -L "$BASE_URL/svg-mcp-macos-x64.tar.gz" -o macos-x64.tar.gz
+        tar -xzf macos-x64.tar.gz
+        mv svg-mcp bin/svg-mcp-macos-x64
+        rm macos-x64.tar.gz
+        
+        # macOS ARM64
+        echo "Downloading macOS ARM64..."
+        curl -L "$BASE_URL/svg-mcp-macos-arm64.tar.gz" -o macos-arm64.tar.gz
+        tar -xzf macos-arm64.tar.gz
+        mv svg-mcp bin/svg-mcp-macos-arm64
+        rm macos-arm64.tar.gz
+        
+        # 设置执行权限
+        chmod +x bin/svg-mcp-*
+        
+        # 显示下载的文件
+        echo "Downloaded binaries:"
+        ls -la bin/
+        
     - name: Publish to NPM
       run: |
         echo "Publishing svg-mcp@${{ steps.version.outputs.version }} to NPM..."

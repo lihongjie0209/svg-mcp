@@ -7,7 +7,6 @@
     "svg-mcp": "./bin/svg-mcp"
   },
   "scripts": {
-    "postinstall": "node install.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -43,7 +42,6 @@
   },
   "files": [
     "bin/",
-    "install.js",
     "index.js",
     "README.md"
   ]

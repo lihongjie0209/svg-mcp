@@ -22,7 +22,7 @@ npm install -g svg-mcp
 # Or run directly with npx (no installation needed)
 npx svg-mcp
 
-# The binary will be automatically downloaded for your platform
+# All platform binaries are included in the package
 ```
 
 ### Option 2: Download Pre-built Binaries
