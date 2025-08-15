@@ -1,0 +1,50 @@
+{
+  "name": "svg-mcp",
+  "version": "1.0.0",
+  "description": "Rust MCP server for SVG to image conversion",
+  "main": "index.js",
+  "bin": {
+    "svg-mcp": "./bin/svg-mcp"
+  },
+  "scripts": {
+    "postinstall": "node install.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "svg",
+    "image",
+    "conversion",
+    "mcp",
+    "png",
+    "jpeg",
+    "rust"
+  ],
+  "author": "lihongjie0209",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lihongjie0209/svg-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lihongjie0209/svg-mcp/issues"
+  },
+  "homepage": "https://github.com/lihongjie0209/svg-mcp#readme",
+  "os": [
+    "win32",
+    "darwin",
+    "linux"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ],
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "files": [
+    "bin/",
+    "install.js",
+    "index.js",
+    "README.md"
+  ]
+}

@@ -13,16 +13,37 @@ A Model Context Protocol (MCP) server written in Rust that provides SVG to image
 
 ## Quick Start
 
-### Prerequisites
+### Option 1: NPM (Recommended)
+
+```bash
+# Install globally
+npm install -g svg-mcp
+
+# Or run directly with npx (no installation needed)
+npx svg-mcp
+
+# The binary will be automatically downloaded for your platform
+```
+
+### Option 2: Download Pre-built Binaries
+
+Download from [GitHub Releases](https://github.com/lihongjie0209/svg-mcp/releases):
+
+- **Windows x64**: `svg-mcp-windows-x64.zip`
+- **Linux x64**: `svg-mcp-linux-x64.tar.gz`
+- **macOS Intel**: `svg-mcp-macos-x64.tar.gz`
+- **macOS Apple Silicon**: `svg-mcp-macos-arm64.tar.gz`
+
+### Option 3: Build from Source
+
+#### Prerequisites
 
 - Rust 1.70 or higher
 - Cargo
 
-### Build and Run
-
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/lihongjie0209/svg-mcp.git
 cd svg-mcp
 
 # Build the project
@@ -32,29 +53,24 @@ cargo build --release
 cargo run --bin svg-mcp
 ```
 
-### Pre-built Binaries
-
-For convenience, you can build platform-specific binaries:
-
-```bash
-# Windows (PowerShell)
-.\build-windows.ps1 -Release
-
-# Output: dist/windows-x64/svg-mcp.exe
-```
-
-For other platforms, see [BUILD_GUIDE.md](BUILD_GUIDE.md) for detailed instructions.
-
-### Test the Functionality
-
-```bash
-# Run the test program to verify conversion works
-cargo run --bin test
-```
+For detailed build instructions, see [BUILD_GUIDE.md](BUILD_GUIDE.md).
 
 ## Usage with Claude Desktop
 
-Add this configuration to your Claude Desktop MCP settings:
+### Using NPM package
+
+```json
+{
+  "mcpServers": {
+    "svg-converter": {
+      "command": "npx",
+      "args": ["svg-mcp"]
+    }
+  }
+}
+```
+
+### Using local binary
 
 ```json
 {
@@ -66,6 +82,14 @@ Add this configuration to your Claude Desktop MCP settings:
   }
 }
 ```
+
+## Installation Methods Comparison
+
+| Method | Pros | Cons |
+|--------|------|------|
+| **NPM** | ✅ Easy installation<br/>✅ Auto-updates<br/>✅ Cross-platform<br/>✅ No manual setup | ❌ Requires Node.js |
+| **Binary** | ✅ No dependencies<br/>✅ Smallest footprint | ❌ Manual updates<br/>❌ Platform-specific download |
+| **Source** | ✅ Latest features<br/>✅ Customizable | ❌ Requires Rust toolchain<br/>❌ Build time |
 
 ## Available Tools
 
