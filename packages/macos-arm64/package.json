@@ -1,5 +1,5 @@
 {
-  "name": "svg-mcp-macos-arm64",
+  "name": "@svg-mcp/macos-arm64",
   "version": "1.0.6",
   "description": "SVG MCP Server - macOS ARM64 binary",
   "main": "index.js",

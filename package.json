@@ -1,5 +1,5 @@
 {
-  "name": "svg-mcp",
+  "name": "@svg-mcp/svg-mcp",
   "version": "1.0.6",
   "description": "Rust MCP server for SVG to image conversion",
   "main": "index.js",
@@ -45,10 +45,10 @@
     "node": ">=14.0.0"
   },
   "optionalDependencies": {
-    "svg-mcp-windows-x64": "1.0.6",
-    "svg-mcp-linux-x64": "1.0.6",
-    "svg-mcp-macos-x64": "1.0.6",
-    "svg-mcp-macos-arm64": "1.0.6"
+    "@svg-mcp/windows-x64": "1.0.6",
+    "@svg-mcp/linux-x64": "1.0.6",
+    "@svg-mcp/macos-x64": "1.0.6",
+    "@svg-mcp/macos-arm64": "1.0.6"
   },
   "files": [
     "index.js",
