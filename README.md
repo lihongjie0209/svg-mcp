@@ -17,10 +17,10 @@ A Model Context Protocol (MCP) server written in Rust that provides SVG to image
 
 ```bash
 # Install globally
-npm install -g svg-mcp
+npm install -g @svg-mcp/svg-mcp
 
 # Or run directly with npx (no installation needed)
-npx svg-mcp
+npx @svg-mcp/svg-mcp
 ```
 
 All platform binaries are automatically included - **no additional downloads required**.
@@ -61,7 +61,7 @@ For detailed build instructions, see [BUILD_GUIDE.md](BUILD_GUIDE.md).
   "mcpServers": {
     "svg-converter": {
       "command": "npx",
-      "args": ["svg-mcp"]
+      "args": ["@svg-mcp/svg-mcp"]
     }
   }
 }

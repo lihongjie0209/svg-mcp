@@ -4,17 +4,17 @@
 
 ### Global Installation
 ```bash
-npm install -g svg-mcp
+npm install -g @svg-mcp/svg-mcp
 ```
 
 ### Direct Usage (No Installation)
 ```bash
-npx svg-mcp
+npx @svg-mcp/svg-mcp
 ```
 
 ## How it Works
 
-The `svg-mcp` npm package uses a **platform-specific package strategy**:
+The `@svg-mcp/svg-mcp` npm package uses a **platform-specific package strategy**:
 
 1. **Smart Installation**: The main package automatically detects your platform and downloads only the required binary package
 2. **Minimal Download**: Users only download binaries for their platform (~5-6MB instead of ~25MB)
@@ -24,7 +24,7 @@ The `svg-mcp` npm package uses a **platform-specific package strategy**:
 
 ## Platform Packages
 
-The main `svg-mcp` package automatically installs one of these platform-specific packages:
+The main `@svg-mcp/svg-mcp` package automatically installs one of these platform-specific packages:
 
 - ✅ **@svg-mcp/win32-x64** - Windows 64-bit (MSVC build)
 - ✅ **@svg-mcp/linux-x64** - Linux 64-bit (Universal)
@@ -36,7 +36,7 @@ The main `svg-mcp` package automatically installs one of these platform-specific
 
 ## Installation Process
 
-When you install `svg-mcp`, this happens:
+When you install `@svg-mcp/svg-mcp`, this happens:
 
 1. **Main Package**: Downloads the lightweight main package (~1KB)
 2. **Platform Detection**: Detects your OS (`win32`, `linux`, `darwin`) and architecture (`x64`, `arm64`)
@@ -44,9 +44,9 @@ When you install `svg-mcp`, this happens:
 4. **Ready to Use**: Binary is immediately available
 
 ```bash
-npm install svg-mcp
+npm install @svg-mcp/svg-mcp
 # ↓
-# Main package: svg-mcp (~1KB)
+# Main package: @svg-mcp/svg-mcp (~1KB)
 # Platform package: @svg-mcp/win32-x64 (~5MB) - only on Windows
 # Total download: ~5MB instead of ~25MB
 ```
@@ -60,7 +60,7 @@ npm install svg-mcp
   "mcpServers": {
     "svg-converter": {
       "command": "npx",
-      "args": ["svg-mcp"]
+      "args": ["@svg-mcp/svg-mcp"]
     }
   }
 }

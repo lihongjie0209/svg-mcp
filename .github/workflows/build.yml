@@ -325,11 +325,29 @@ jobs:
       run: |
         VERSION="${{ steps.version.outputs.version }}"
         
-        # 更新每个平台包的版本号
+        # 更新每个平台包的版本号，使用更安全的方法
         for pkg_dir in packages/*/; do
           if [ -f "$pkg_dir/package.json" ]; then
             echo "Updating version in $pkg_dir/package.json to $VERSION"
-            sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" "$pkg_dir/package.json"
+            # 使用node来安全地更新JSON文件
+            node -e "
+              const fs = require('fs');
+              const path = require('path');
+              const pkgPath = path.join('$pkg_dir', 'package.json');
+              const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+              pkg.version = '$VERSION';
+              fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
+              console.log('Updated', pkg.name, 'to version', pkg.version);
+            "
+            
+            # 验证JSON格式是否正确
+            if ! node -e "JSON.parse(require('fs').readFileSync('$pkg_dir/package.json', 'utf8'))"; then
+              echo "❌ Invalid JSON in $pkg_dir/package.json"
+              cat "$pkg_dir/package.json"
+              exit 1
+            else
+              echo "✅ Valid JSON in $pkg_dir/package.json"
+            fi
           fi
         done
         
@@ -384,14 +402,34 @@ jobs:
       run: |
         VERSION="${{ steps.version.outputs.version }}"
         
-        # 更新主包版本
-        npm version $VERSION --no-git-tag-version
+        # 使用更安全的方法更新主包版本和依赖
+        node -e "
+          const fs = require('fs');
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          pkg.version = '$VERSION';
+          
+          // 更新 optionalDependencies 中的平台包版本
+          if (pkg.optionalDependencies) {
+            Object.keys(pkg.optionalDependencies).forEach(dep => {
+              if (dep.startsWith('@svg-mcp/')) {
+                pkg.optionalDependencies[dep] = '$VERSION';
+              }
+            });
+          }
+          
+          fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+          console.log('Updated main package to version', pkg.version);
+          console.log('Updated optional dependencies:', pkg.optionalDependencies);
+        "
         
-        # 更新 optionalDependencies 中的平台包版本
-        sed -i "s/\"@svg-mcp\/win32-x64\": \".*\"/\"@svg-mcp\/win32-x64\": \"$VERSION\"/" package.json
-        sed -i "s/\"@svg-mcp\/linux-x64\": \".*\"/\"@svg-mcp\/linux-x64\": \"$VERSION\"/" package.json
-        sed -i "s/\"@svg-mcp\/darwin-x64\": \".*\"/\"@svg-mcp\/darwin-x64\": \"$VERSION\"/" package.json
-        sed -i "s/\"@svg-mcp\/darwin-arm64\": \".*\"/\"@svg-mcp\/darwin-arm64\": \"$VERSION\"/" package.json
+        # 验证JSON格式
+        if ! node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))"; then
+          echo "❌ Invalid JSON in package.json"
+          cat package.json
+          exit 1
+        else
+          echo "✅ Valid JSON in package.json"
+        fi
         
         echo "Updated package.json:"
         cat package.json
@@ -417,8 +455,8 @@ jobs:
         
     - name: Publish main package
       run: |
-        echo "Publishing main svg-mcp package..."
+        echo "Publishing main @svg-mcp/svg-mcp package..."
         npm publish
-        echo "✅ Published svg-mcp@${{ steps.version.outputs.version }}"
+        echo "✅ Published @svg-mcp/svg-mcp@${{ steps.version.outputs.version }}"
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
