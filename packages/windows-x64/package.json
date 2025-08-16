@@ -1,5 +1,5 @@
 {
-  "name": "@svg-mcp/windows-x64",
+  "name": "svg-mcp-windows-x64",
   "version": "1.0.6",
   "description": "SVG MCP Server binary for Windows x64",
   "main": "index.js",

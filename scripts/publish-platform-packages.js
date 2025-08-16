@@ -36,7 +36,7 @@ async function publishPlatformPackages() {
       // 提取平台名称，例如 "svg-mcp-windows-x64" -> "windows-x64"
       const platformName = artifactDir.replace('svg-mcp-', '');
 
-      console.log(`\nProcessing ${platformName} -> @svg-mcp/${platformName}`);
+      console.log(`\nProcessing ${platformName} -> svg-mcp-${platformName}`);
 
       const packageDir = path.join(packagesPath, platformName);
       const artifactPath = path.join(distPath, artifactDir);
@@ -77,16 +77,16 @@ async function publishPlatformPackages() {
       console.log(`Updated ${packageJsonPath} to version ${version}`);
 
       // 发布包
-      console.log(`Publishing @svg-mcp/${platformName}@${version}...`);
+      console.log(`Publishing svg-mcp-${platformName}@${version}...`);
       try {
         execSync('npm publish', { 
           cwd: packageDir, 
           stdio: 'inherit',
           env: { ...process.env }
         });
-        console.log(`✅ Successfully published @svg-mcp/${platformName}@${version}`);
+        console.log(`✅ Successfully published svg-mcp-${platformName}@${version}`);
       } catch (error) {
-        console.error(`❌ Failed to publish @svg-mcp/${platformName}:`, error.message);
+        console.error(`❌ Failed to publish svg-mcp-${platformName}:`, error.message);
         // 不要因为单个包发布失败就终止整个流程
       }
     }

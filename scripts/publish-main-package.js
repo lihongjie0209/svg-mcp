@@ -43,10 +43,10 @@ async function publishMainPackage() {
 
     // 定义所有平台包
     const platformPackages = [
-      '@svg-mcp/windows-x64',
-      '@svg-mcp/linux-x64', 
-      '@svg-mcp/macos-x64',
-      '@svg-mcp/macos-arm64'
+      'svg-mcp-windows-x64',
+      'svg-mcp-linux-x64', 
+      'svg-mcp-macos-x64',
+      'svg-mcp-macos-arm64'
     ];
 
     // 更新主包的package.json
@@ -59,7 +59,7 @@ async function publishMainPackage() {
     // 更新optionalDependencies中的平台包版本
     if (packageJson.optionalDependencies) {
       Object.keys(packageJson.optionalDependencies).forEach(dep => {
-        if (dep.startsWith('@svg-mcp/')) {
+        if (dep.startsWith('svg-mcp-')) {
           packageJson.optionalDependencies[dep] = version;
         }
       });
@@ -96,13 +96,13 @@ async function publishMainPackage() {
     }
 
     // 发布主包
-    console.log('\nPublishing main @svg-mcp/svg-mcp package...');
+    console.log('\nPublishing main svg-mcp package...');
     try {
       execSync('npm publish', { 
         stdio: 'inherit',
         env: { ...process.env }
       });
-      console.log(`✅ Published @svg-mcp/svg-mcp@${version}`);
+      console.log(`✅ Published svg-mcp@${version}`);
     } catch (error) {
       console.error('❌ Failed to publish main package:', error.message);
       throw error;
