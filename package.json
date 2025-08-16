@@ -45,7 +45,7 @@
     "node": ">=14.0.0"
   },
   "optionalDependencies": {
-    "@svg-mcp/win32-x64": "1.0.5",
+    "@svg-mcp/windows-x64": "1.0.5",
     "@svg-mcp/linux-x64": "1.0.5",
     "@svg-mcp/macos-x64": "1.0.5",
     "@svg-mcp/macos-arm64": "1.0.5"

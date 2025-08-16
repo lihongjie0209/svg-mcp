@@ -1,0 +1,22 @@
+{
+  "name": "@svg-mcp/linux-x64",
+  "version": "1.0.5",
+  "description": "SVG MCP Server binary for Linux x64",
+  "main": "index.js",
+  "os": ["linux"],
+  "cpu": ["x64"],
+  "keywords": ["svg", "mcp", "linux", "binary"],
+  "author": {
+    "name": "lihongjie0209",
+    "url": "https://github.com/lihongjie0209"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lihongjie0209/svg-mcp.git"
+  },
+  "files": [
+    "bin/",
+    "index.js"
+  ]
+}
