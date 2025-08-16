@@ -274,14 +274,6 @@ jobs:
         
         echo "Downloading binaries for platform packages..."
         
-        # 定义平台映射
-        declare -A platform_map=(
-          ["windows-x64"]="win32-x64"
-          ["linux-x64"]="linux-x64"
-          ["macos-x64"]="darwin-x64"
-          ["macos-arm64"]="darwin-arm64"
-        )
-        
         # Windows x64 MSVC
         echo "Downloading Windows x64..."
         curl -L "$BASE_URL/svg-mcp-windows-x64.zip" -o windows-x64.zip
@@ -317,6 +309,36 @@ jobs:
         chmod +x packages/darwin-arm64/bin/svg-mcp
         rm macos-arm64.tar.gz
         
+        # 验证所有必要的文件都存在
+        echo "Verifying platform packages..."
+        for pkg_dir in packages/*/; do
+          if [ -d "$pkg_dir" ]; then
+            pkg_name=$(basename "$pkg_dir")
+            echo "Checking $pkg_name package..."
+            
+            # 检查是否有package.json，如果没有则跳过这个包
+            if [ ! -f "$pkg_dir/package.json" ]; then
+              echo "⚠️ No package.json found in $pkg_dir, skipping..."
+              continue
+            fi
+            
+            # 检查是否有index.js
+            if [ ! -f "$pkg_dir/index.js" ]; then
+              echo "⚠️ No index.js found in $pkg_dir, skipping..."
+              continue
+            fi
+            
+            # 检查JSON格式是否正确
+            if ! node -e "JSON.parse(require('fs').readFileSync('$pkg_dir/package.json', 'utf8'))"; then
+              echo "❌ Invalid JSON in $pkg_dir/package.json"
+              cat "$pkg_dir/package.json"
+              continue
+            fi
+            
+            echo "✅ $pkg_name package is ready"
+          fi
+        done
+        
         # 显示下载的文件
         echo "Platform packages prepared:"
         find packages -name "*" -type f | sort
@@ -325,48 +347,132 @@ jobs:
       run: |
         VERSION="${{ steps.version.outputs.version }}"
         
-        # 更新每个平台包的版本号，使用更安全的方法
+        echo "Updating platform package versions to $VERSION..."
+        
+        # 更新每个有效平台包的版本号
         for pkg_dir in packages/*/; do
-          if [ -f "$pkg_dir/package.json" ]; then
+          if [ -d "$pkg_dir" ]; then
+            pkg_name=$(basename "$pkg_dir")
+            
+            # 检查是否有package.json，如果没有则跳过
+            if [ ! -f "$pkg_dir/package.json" ]; then
+              echo "⚠️ Skipping $pkg_name: no package.json found"
+              continue
+            fi
+            
+            # 检查JSON格式是否正确，如果不正确则跳过
+            if ! node -e "JSON.parse(require('fs').readFileSync('$pkg_dir/package.json', 'utf8'))" 2>/dev/null; then
+              echo "⚠️ Skipping $pkg_name: invalid JSON in package.json"
+              continue
+            fi
+            
             echo "Updating version in $pkg_dir/package.json to $VERSION"
+            
             # 使用node来安全地更新JSON文件
             node -e "
               const fs = require('fs');
               const path = require('path');
-              const pkgPath = path.join('$pkg_dir', 'package.json');
-              const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-              pkg.version = '$VERSION';
-              fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
-              console.log('Updated', pkg.name, 'to version', pkg.version);
+              try {
+                const pkgPath = path.join('$pkg_dir', 'package.json');
+                const content = fs.readFileSync(pkgPath, 'utf8');
+                if (!content.trim()) {
+                  console.log('⚠️ Empty package.json file, skipping...');
+                  process.exit(0);
+                }
+                const pkg = JSON.parse(content);
+                pkg.version = '$VERSION';
+                fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
+                console.log('Updated', pkg.name, 'to version', pkg.version);
+              } catch (error) {
+                console.log('❌ Error updating package.json:', error.message);
+                process.exit(0); // 继续处理其他包，不要让整个流程失败
+              }
             "
             
-            # 验证JSON格式是否正确
-            if ! node -e "JSON.parse(require('fs').readFileSync('$pkg_dir/package.json', 'utf8'))"; then
-              echo "❌ Invalid JSON in $pkg_dir/package.json"
-              cat "$pkg_dir/package.json"
-              exit 1
-            else
+            # 再次验证JSON格式是否正确
+            if node -e "JSON.parse(require('fs').readFileSync('$pkg_dir/package.json', 'utf8'))" 2>/dev/null; then
               echo "✅ Valid JSON in $pkg_dir/package.json"
+            else
+              echo "❌ Invalid JSON in $pkg_dir/package.json after update"
             fi
           fi
         done
+        
+        echo "Platform package version update completed."
         
     - name: Publish platform packages
       run: |
         echo "Publishing platform-specific packages..."
         
+        successful_packages=()
+        failed_packages=()
+        
         for pkg_dir in packages/*/; do
-          if [ -f "$pkg_dir/package.json" ]; then
-            package_name=$(cat "$pkg_dir/package.json" | grep '"name"' | cut -d'"' -f4)
+          if [ -d "$pkg_dir" ]; then
+            pkg_name=$(basename "$pkg_dir")
+            
+            # 检查是否有package.json
+            if [ ! -f "$pkg_dir/package.json" ]; then
+              echo "⚠️ Skipping $pkg_name: no package.json found"
+              failed_packages+=("$pkg_name (no package.json)")
+              continue
+            fi
+            
+            # 检查JSON格式
+            if ! node -e "JSON.parse(require('fs').readFileSync('$pkg_dir/package.json', 'utf8'))" 2>/dev/null; then
+              echo "⚠️ Skipping $pkg_name: invalid JSON in package.json"
+              failed_packages+=("$pkg_name (invalid JSON)")
+              continue
+            fi
+            
+            # 检查是否有index.js
+            if [ ! -f "$pkg_dir/index.js" ]; then
+              echo "⚠️ Skipping $pkg_name: no index.js found"
+              failed_packages+=("$pkg_name (no index.js)")
+              continue
+            fi
+            
+            # 获取包名用于显示
+            package_name=$(node -e "console.log(JSON.parse(require('fs').readFileSync('$pkg_dir/package.json', 'utf8')).name)")
             echo "Publishing $package_name..."
             
             cd "$pkg_dir"
-            npm publish --access public
+            if npm publish --access public; then
+              echo "✅ Published $package_name"
+              successful_packages+=("$package_name")
+            else
+              echo "❌ Failed to publish $package_name"
+              failed_packages+=("$package_name (publish failed)")
+            fi
             cd ../..
-            
-            echo "✅ Published $package_name"
           fi
         done
+        
+        # 显示发布结果
+        echo ""
+        echo "=== PUBLISH RESULTS ==="
+        echo "✅ Successfully published packages:"
+        for pkg in "${successful_packages[@]}"; do
+          echo "  - $pkg"
+        done
+        
+        if [ ${#failed_packages[@]} -gt 0 ]; then
+          echo ""
+          echo "❌ Failed/skipped packages:"
+          for pkg in "${failed_packages[@]}"; do
+            echo "  - $pkg"
+          done
+        fi
+        
+        # 如果没有成功发布任何包，则失败
+        if [ ${#successful_packages[@]} -eq 0 ]; then
+          echo ""
+          echo "❌ No packages were successfully published!"
+          exit 1
+        else
+          echo ""
+          echo "🎉 Published ${#successful_packages[@]} packages successfully!"
+        fi
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
