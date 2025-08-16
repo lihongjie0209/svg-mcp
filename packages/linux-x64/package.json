@@ -1,6 +1,6 @@
 {
   "name": "@svg-mcp/linux-x64",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "SVG MCP Server binary for Linux x64",
   "main": "index.js",
   "os": ["linux"],
