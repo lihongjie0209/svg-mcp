@@ -1,6 +1,6 @@
 # Rust
 /target/
-Cargo.lock
+**/*.rs.bk
 
 # Node.js / NPM
 node_modules/
@@ -9,6 +9,12 @@ yarn-debug.log*
 yarn-error.log*
 .npm
 .yarn-integrity
+
+# Build outputs (CI-generated)
+/dist/
+*.exe
+*.zip
+*.tar.gz
 
 # IDE
 .vscode/

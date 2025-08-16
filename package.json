@@ -4,10 +4,11 @@
   "description": "Rust MCP server for SVG to image conversion",
   "main": "index.js",
   "bin": {
-    "svg-mcp": "./bin/svg-mcp"
+    "svg-mcp": "./index.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "node scripts/postinstall.js"
   },
   "keywords": [
     "svg",
@@ -43,9 +44,15 @@
   "engines": {
     "node": ">=14.0.0"
   },
+  "optionalDependencies": {
+    "@svg-mcp/win32-x64": "1.0.0",
+    "@svg-mcp/linux-x64": "1.0.0",
+    "@svg-mcp/darwin-x64": "1.0.0",
+    "@svg-mcp/darwin-arm64": "1.0.0"
+  },
   "files": [
-    "bin/",
     "index.js",
+    "scripts/",
     "README.md"
   ]
 }

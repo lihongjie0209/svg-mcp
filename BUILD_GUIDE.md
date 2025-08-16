@@ -1,246 +1,206 @@
-# Cross-Platform Build Guide for SVG MCP Server
+# Build Guide for SVG MCP Server
 
-这个指南将帮助您为不同平台构建SVG MCP服务器的可执行文件。
+SVG MCP Server 使用 **GitHub Actions CI/CD** 进行自动化构建和发布。这确保了所有平台的二进制文件都是在干净、一致的环境中构建的。
 
-## 快速开始 (Windows)
+## 🚀 自动化构建流程
 
-### 使用PowerShell脚本
+### 支持的平台
 
-```powershell
-# 构建发布版本
-.\build-windows.ps1 -Release
+项目自动为以下平台构建二进制文件：
 
-# 构建调试版本
-.\build-windows.ps1
-```
+- **Windows x64 (MSVC)** - 推荐的 Windows 版本
+- **Windows x64 (GNU)** - 备用 Windows 版本
+- **Linux x64** - 通用 Linux 发行版
+- **macOS Intel (x64)** - Intel 芯片的 Mac
+- **macOS Apple Silicon (ARM64)** - M1/M2/M3 芯片的 Mac
 
-### 手动构建
+### 构建触发条件
 
-```bash
-# 构建当前平台
-cargo build --release
+GitHub Actions 会在以下情况下自动构建：
 
-# 输出位置
-# target/release/svg-mcp.exe (Windows)
-```
+1. **推送到主分支**
+   ```bash
+   git push origin main
+   ```
 
-## 完整跨平台构建
+2. **创建 Pull Request**
+   ```bash
+   # PR 会触发构建验证
+   ```
 
-### 1. 使用GitHub Actions (推荐)
-
-项目包含GitHub Actions工作流，会自动为所有平台构建：
-
-1. 推送代码到GitHub
-2. 创建标签触发发布：
+3. **创建版本标签**
    ```bash
    git tag v1.0.0
    git push origin v1.0.0
    ```
-3. GitHub会自动构建并创建release
 
-支持的平台：
-- Windows x64 (MSVC)
-- Windows x64 (GNU)
-- Linux x64
-- macOS Intel (x64)
-- macOS Apple Silicon (ARM64)
+4. **手动触发**
+   - 在 GitHub 仓库页面
+   - 进入 "Actions" 选项卡
+   - 选择 "Build and Release" workflow
+   - 点击 "Run workflow"
 
-### 2. 本地跨平台构建
+## 📦 发布流程
 
-#### 安装目标平台
+### 自动发布
 
-```bash
-# 安装交叉编译目标
-rustup target add x86_64-unknown-linux-gnu
-rustup target add x86_64-apple-darwin
-rustup target add aarch64-apple-darwin
-rustup target add x86_64-pc-windows-gnu
-```
+当创建版本标签时，系统会自动：
 
-#### 构建特定平台
+1. **构建所有平台的二进制文件**
+2. **创建 GitHub Release**
+3. **上传平台特定的压缩包**
+4. **发布到 NPM**
 
 ```bash
-# Windows (当前已支持)
-cargo build --release --target x86_64-pc-windows-msvc
+# 创建新版本
+git tag v1.2.3
+git push origin v1.2.3
 
-# Linux (需要交叉编译工具链)
-cargo build --release --target x86_64-unknown-linux-gnu
-
-# macOS Intel (需要交叉编译工具链)
-cargo build --release --target x86_64-apple-darwin
-
-# macOS Apple Silicon (需要交叉编译工具链)
-cargo build --release --target aarch64-apple-darwin
+# 系统会自动：
+# 1. 构建 5 个平台的二进制文件
+# 2. 创建 GitHub Release v1.2.3
+# 3. 上传 svg-mcp-windows-x64.zip 等文件
+# 4. 发布 svg-mcp@1.2.3 到 NPM
 ```
 
-### 3. 平台特定构建
+### 手动发布
 
-#### Windows
-- ✅ **原生支持**: 在Windows上直接构建
-- **工具**: Visual Studio Build Tools 或 Visual Studio
-- **目标**: `x86_64-pc-windows-msvc`
+也可以通过 GitHub 界面手动触发发布：
 
-#### Linux
-- **原生构建**: 在Linux系统上构建
-- **交叉编译**: 需要Linux交叉编译工具链
-- **目标**: `x86_64-unknown-linux-gnu`
+1. 进入 GitHub 仓库的 "Actions" 页面
+2. 选择 "Build and Release" workflow
+3. 点击 "Run workflow"
+4. 输入版本号（如 `v1.2.3`）
+5. 选择是否创建 GitHub Release
+6. 点击 "Run workflow"
 
-#### macOS
-- **原生构建**: 在macOS系统上构建
-- **交叉编译**: 需要Xcode工具链（仅在macOS上可用）
-- **目标**: 
-  - Intel: `x86_64-apple-darwin`
-  - Apple Silicon: `aarch64-apple-darwin`
+## 📋 构建产物
 
-## 构建脚本说明
+### GitHub Release 文件
 
-### Windows构建脚本
-
-- `build-windows.ps1`: 简单的Windows构建脚本
-- `build-simple.ps1`: 尝试多平台构建（可能需要额外工具）
-- `build-all.ps1`: 完整的跨平台构建脚本
-
-### Unix构建脚本
-
-- `build-all.sh`: Linux/macOS构建脚本
-- `Makefile`: Make构建系统
-
-## 输出文件结构
+每次发布会创建以下文件：
 
 ```
-dist/
-├── README.md
-├── windows-x64/
-│   └── svg-mcp.exe          # Windows可执行文件
-├── linux-x64/
-│   └── svg-mcp              # Linux可执行文件
-├── macos-x64/
-│   └── svg-mcp              # macOS Intel可执行文件
-└── macos-arm64/
-    └── svg-mcp              # macOS Apple Silicon可执行文件
+svg-mcp-windows-x64.zip       # Windows MSVC 版本
+svg-mcp-windows-x64-gnu.zip   # Windows GNU 版本
+svg-mcp-linux-x64.tar.gz     # Linux 版本
+svg-mcp-macos-x64.tar.gz     # macOS Intel 版本
+svg-mcp-macos-arm64.tar.gz   # macOS Apple Silicon 版本
 ```
 
-## 使用构建的可执行文件
+### NPM 包
 
-### 1. 直接运行
+NPM 包 `svg-mcp` 包含所有平台的二进制文件，会根据用户的操作系统自动选择合适的版本。
+
+## 🔧 开发者指南
+
+### 本地开发
+
+对于本地开发和测试，仍然可以使用标准的 Rust 工具：
 
 ```bash
-# Windows
-cd dist/windows-x64
-./svg-mcp.exe
+# 安装依赖
+cargo check
 
-# Linux/macOS
-cd dist/linux-x64  # 或其他平台目录
-./svg-mcp
+# 本地构建（当前平台）
+cargo build
+
+# 运行测试
+cargo test
+
+# 本地运行
+cargo run
 ```
 
-### 2. Claude Desktop配置
+### 测试构建
 
-将可执行文件的完整路径添加到Claude Desktop配置：
-
-```json
-{
-  "mcpServers": {
-    "svg-converter": {
-      "command": "/full/path/to/svg-mcp",
-      "args": []
-    }
-  }
-}
-```
-
-### 3. 系统路径安装
+在推送代码前，建议本地测试：
 
 ```bash
-# 复制到系统路径 (需要管理员权限)
-# Windows
-copy dist\windows-x64\svg-mcp.exe C:\Windows\System32\
+# 检查代码
+cargo check
+cargo clippy
+cargo fmt --check
 
-# Linux/macOS
-sudo cp dist/linux-x64/svg-mcp /usr/local/bin/
+# 运行测试
+cargo test
+
+# 构建发布版本
+cargo build --release
 ```
 
-## 故障排除
+### 版本管理
+
+1. **更新版本号**
+   ```bash
+   # 更新 Cargo.toml 中的版本
+   # 更新 package.json 中的版本
+   ```
+
+2. **提交更改**
+   ```bash
+   git add .
+   git commit -m "Release v1.2.3"
+   git push origin main
+   ```
+
+3. **创建标签**
+   ```bash
+   git tag v1.2.3
+   git push origin v1.2.3
+   ```
+
+## 🔍 监控构建
+
+### 查看构建状态
+
+1. 访问 GitHub 仓库的 "Actions" 页面
+2. 查看最新的 workflow 运行状态
+3. 点击具体的运行查看详细日志
 
 ### 常见问题
 
-1. **交叉编译失败**
-   - 解决方案: 使用GitHub Actions或在目标平台上原生构建
+**Q: 构建失败了怎么办？**
+A: 查看 GitHub Actions 的错误日志，通常是：
+- 依赖问题
+- 代码编译错误
+- 测试失败
 
-2. **依赖问题**
-   - 确保安装了所有必需的系统依赖
-   - Linux: `pkg-config`, `build-essential`
-   - Windows: Visual Studio Build Tools
+**Q: 如何修复失败的构建？**
+A: 
+1. 本地修复问题
+2. 提交并推送修复
+3. 重新创建标签或手动触发构建
 
-3. **权限问题**
-   - 确保可执行文件有执行权限
-   - Linux/macOS: `chmod +x svg-mcp`
+**Q: NPM 发布失败？**
+A: 检查：
+- NPM_TOKEN 是否正确设置
+- 版本号是否已存在
+- GitHub Release 是否成功创建
 
-### 验证构建
+## 🎯 最佳实践
 
-测试构建的可执行文件：
+1. **版本控制**
+   - 使用语义化版本号（如 v1.2.3）
+   - 在发布前充分测试
 
-```bash
-# 运行测试
-cargo run --bin test
+2. **代码质量**
+   - 确保所有测试通过
+   - 使用 `cargo clippy` 检查代码质量
+   - 使用 `cargo fmt` 格式化代码
 
-# 检查可执行文件
-file dist/windows-x64/svg-mcp.exe  # Linux/macOS
-```
+3. **发布频率**
+   - 功能稳定后再发布
+   - 重要修复及时发布
+   - 保持发布说明清晰
 
-## 持续集成
+## 📚 相关文档
 
-项目配置了GitHub Actions工作流：
-- `.github/workflows/build.yml`: 自动构建和发布
-- 支持标签触发的自动发布
-- 生成跨平台二进制文件
+- [GitHub Actions Workflow](.github/workflows/build.yml)
+- [Cargo 配置](Cargo.toml)
+- [NPM 配置](package.json)
+- [使用指南](USAGE.md)
 
-## 高级选项
+---
 
-### 自定义构建
-
-```bash
-# 优化大小
-cargo build --release --target x86_64-pc-windows-msvc
-strip target/x86_64-pc-windows-msvc/release/svg-mcp.exe
-
-# 添加调试信息
-cargo build --release --target x86_64-pc-windows-msvc --features debug
-```
-
-### Docker构建
-
-使用Docker进行跨平台构建：
-
-```dockerfile
-# 多阶段构建示例
-FROM rust:1.70 as builder
-WORKDIR /app
-COPY . .
-RUN cargo build --release
-
-FROM debian:bullseye-slim
-COPY --from=builder /app/target/release/svg-mcp /usr/local/bin/
-CMD ["svg-mcp"]
-```
-
-## 分发
-
-### 打包发布
-
-```bash
-# 创建压缩包
-cd dist
-tar -czf svg-mcp-windows-x64.tar.gz windows-x64/
-zip -r svg-mcp-windows-x64.zip windows-x64/
-```
-
-### 校验和
-
-```bash
-# 生成校验和
-cd dist
-sha256sum */svg-mcp* > checksums.sha256
-```
-
-这样您就可以为各个平台生成可执行文件了！
+通过这个自动化的构建和发布流程，确保了所有用户都能获得高质量、一致的二进制文件，而不需要开发者手动维护复杂的本地构建环境。

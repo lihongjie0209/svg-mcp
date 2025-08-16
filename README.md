@@ -21,43 +21,40 @@ npm install -g svg-mcp
 
 # Or run directly with npx (no installation needed)
 npx svg-mcp
-
-# All platform binaries are included in the package
 ```
+
+All platform binaries are automatically included - **no additional downloads required**.
 
 ### Option 2: Download Pre-built Binaries
 
 Download from [GitHub Releases](https://github.com/lihongjie0209/svg-mcp/releases):
 
-- **Windows x64**: `svg-mcp-windows-x64.zip`
+- **Windows x64**: `svg-mcp-windows-x64.zip` (MSVC build - recommended)
+- **Windows x64 GNU**: `svg-mcp-windows-x64-gnu.zip` (GNU build - alternative)  
 - **Linux x64**: `svg-mcp-linux-x64.tar.gz`
 - **macOS Intel**: `svg-mcp-macos-x64.tar.gz`
 - **macOS Apple Silicon**: `svg-mcp-macos-arm64.tar.gz`
 
+All binaries are built automatically via **GitHub Actions CI/CD** for consistent quality.
+
 ### Option 3: Build from Source
-
-#### Prerequisites
-
-- Rust 1.70 or higher
-- Cargo
 
 ```bash
 # Clone the repository
 git clone https://github.com/lihongjie0209/svg-mcp.git
 cd svg-mcp
 
-# Build the project
+# Build for your platform
 cargo build --release
 
-# Run the MCP server
-cargo run --bin svg-mcp
+# The binary will be at: target/release/svg-mcp (or .exe on Windows)
 ```
 
 For detailed build instructions, see [BUILD_GUIDE.md](BUILD_GUIDE.md).
 
 ## Usage with Claude Desktop
 
-### Using NPM package
+### Using NPM package (recommended)
 
 ```json
 {
@@ -87,9 +84,18 @@ For detailed build instructions, see [BUILD_GUIDE.md](BUILD_GUIDE.md).
 
 | Method | Pros | Cons |
 |--------|------|------|
-| **NPM** | ✅ Easy installation<br/>✅ Auto-updates<br/>✅ Cross-platform<br/>✅ No manual setup | ❌ Requires Node.js |
-| **Binary** | ✅ No dependencies<br/>✅ Smallest footprint | ❌ Manual updates<br/>❌ Platform-specific download |
-| **Source** | ✅ Latest features<br/>✅ Customizable | ❌ Requires Rust toolchain<br/>❌ Build time |
+| **NPM** | ✅ Easy installation<br/>✅ Auto-updates<br/>✅ Cross-platform<br/>✅ No manual setup<br/>✅ CI-built quality | ❌ Requires Node.js<br/>❌ Larger package size |
+| **GitHub Binary** | ✅ No dependencies<br/>✅ Smallest footprint<br/>✅ CI-built quality | ❌ Manual updates<br/>❌ Platform-specific download |
+| **Build from Source** | ✅ Latest features<br/>✅ Customizable<br/>✅ Minimal size | ❌ Requires Rust toolchain<br/>❌ Build time<br/>❌ Manual updates |
+
+### Build Quality Assurance
+
+🏗️ **All binaries are built using GitHub Actions CI/CD**:
+- ✅ **Clean Environment**: Built in fresh CI runners
+- ✅ **Consistent**: Same build process across all platforms  
+- ✅ **Tested**: Automated testing before release
+- ✅ **Reproducible**: Source code exactly matches releases
+- ✅ **Secure**: Built in GitHub's secure infrastructure
 
 ## Available Tools
 
@@ -258,35 +264,57 @@ Or when `return_base64` is true:
 
 ## Development
 
-### Building from Source
+### Local Development
 
 ```bash
-# Debug build
-cargo build
-
-# Release build
-cargo build --release
+# Check code
+cargo check
+cargo clippy
 
 # Run tests
 cargo test
 
-# Run with debug logging
-RUST_LOG=debug cargo run --bin svg-mcp
+# Run locally
+cargo run
+
+# Build for your platform
+cargo build --release
 ```
+
+### CI/CD and Releases
+
+**All production builds use GitHub Actions CI/CD:**
+
+- 🏗️ **Automated Building**: Every push and PR triggers builds
+- 🔖 **Version Releases**: Git tags automatically create releases
+- 📦 **NPM Publishing**: Releases automatically publish to NPM  
+- 🧪 **Quality Testing**: All builds include automated testing
+- 🌐 **Multi-Platform**: Builds for Windows, Linux, and macOS simultaneously
+
+See [BUILD_GUIDE.md](BUILD_GUIDE.md) for complete CI/CD details.
 
 ### Code Structure
 
 - `src/lib.rs`: Core conversion logic and MCP server implementation
 - `src/main.rs`: Server entry point and CLI interface
 - `src/test.rs`: Test program for functionality verification
+- `.github/workflows/build.yml`: CI/CD pipeline definition
 
 ## Contributing
 
 1. Fork the repository
 2. Create a feature branch
-3. Make your changes
+3. Make your changes  
 4. Add tests if needed
 5. Submit a pull request
+
+The CI system will automatically build and test your changes across all platforms.
+
+## Documentation
+
+- 📖 [Build Guide](BUILD_GUIDE.md) - CI/CD and development setup
+- 📦 [NPM Usage](NPM_USAGE.md) - Detailed NPM package usage
+- 🔧 [Usage Guide](USAGE.md) - MCP server configuration and usage
 
 ## License
 
@@ -294,4 +322,6 @@ This project is licensed under the MIT License. See LICENSE file for details.
 
 ## Support
 
-For issues, questions, or contributions, please visit the project repository or open an issue.
+- 🐛 **Issues**: Report bugs via [GitHub Issues](https://github.com/lihongjie0209/svg-mcp/issues)
+- 📥 **Downloads**: Get binaries from [GitHub Releases](https://github.com/lihongjie0209/svg-mcp/releases)
+- 📦 **NPM**: Install via [npm package](https://www.npmjs.com/package/svg-mcp)

@@ -1,0 +1,22 @@
+{
+  "name": "@svg-mcp/darwin-arm64",
+  "version": "1.0.0",
+  "description": "SVG MCP Server binary for macOS ARM64",
+  "main": "index.js",
+  "os": ["darwin"],
+  "cpu": ["arm64"],
+  "keywords": ["svg", "mcp", "macos", "arm64", "binary"],
+  "author": {
+    "name": "lihongjie0209",
+    "url": "https://github.com/lihongjie0209"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lihongjie0209/svg-mcp.git"
+  },
+  "files": [
+    "bin/",
+    "index.js"
+  ]
+}
