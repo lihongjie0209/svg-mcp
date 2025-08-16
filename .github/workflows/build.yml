@@ -304,9 +304,9 @@ jobs:
         cd temp/macos-x64
         tar -xzf ../../macos-x64.tar.gz
         cd ../..
-        mkdir -p packages/darwin-x64/bin
-        mv temp/macos-x64/svg-mcp packages/darwin-x64/bin/
-        chmod +x packages/darwin-x64/bin/svg-mcp
+        mkdir -p packages/macos-x64/bin
+        mv temp/macos-x64/svg-mcp packages/macos-x64/bin/
+        chmod +x packages/macos-x64/bin/svg-mcp
         rm -rf temp/macos-x64 macos-x64.tar.gz
         
         # macOS ARM64
@@ -316,9 +316,9 @@ jobs:
         cd temp/macos-arm64
         tar -xzf ../../macos-arm64.tar.gz
         cd ../..
-        mkdir -p packages/darwin-arm64/bin
-        mv temp/macos-arm64/svg-mcp packages/darwin-arm64/bin/
-        chmod +x packages/darwin-arm64/bin/svg-mcp
+        mkdir -p packages/macos-arm64/bin
+        mv temp/macos-arm64/svg-mcp packages/macos-arm64/bin/
+        chmod +x packages/macos-arm64/bin/svg-mcp
         rm -rf temp/macos-arm64 macos-arm64.tar.gz
         
         # 验证所有必要的文件都存在
