@@ -277,37 +277,49 @@ jobs:
         # Windows x64 MSVC
         echo "Downloading Windows x64..."
         curl -L "$BASE_URL/svg-mcp-windows-x64.zip" -o windows-x64.zip
-        unzip windows-x64.zip
+        mkdir -p temp/windows-x64
+        cd temp/windows-x64
+        unzip ../../windows-x64.zip
+        cd ../..
         mkdir -p packages/win32-x64/bin
-        mv svg-mcp.exe packages/win32-x64/bin/
-        rm windows-x64.zip
+        mv temp/windows-x64/svg-mcp.exe packages/win32-x64/bin/
+        rm -rf temp/windows-x64 windows-x64.zip
         
         # Linux x64
         echo "Downloading Linux x64..."
         curl -L "$BASE_URL/svg-mcp-linux-x64.tar.gz" -o linux-x64.tar.gz
-        tar -xzf linux-x64.tar.gz
+        mkdir -p temp/linux-x64
+        cd temp/linux-x64
+        tar -xzf ../../linux-x64.tar.gz
+        cd ../..
         mkdir -p packages/linux-x64/bin
-        mv svg-mcp packages/linux-x64/bin/
+        mv temp/linux-x64/svg-mcp packages/linux-x64/bin/
         chmod +x packages/linux-x64/bin/svg-mcp
-        rm linux-x64.tar.gz
+        rm -rf temp/linux-x64 linux-x64.tar.gz
         
         # macOS x64
         echo "Downloading macOS x64..."
         curl -L "$BASE_URL/svg-mcp-macos-x64.tar.gz" -o macos-x64.tar.gz
-        tar -xzf macos-x64.tar.gz
+        mkdir -p temp/macos-x64
+        cd temp/macos-x64
+        tar -xzf ../../macos-x64.tar.gz
+        cd ../..
         mkdir -p packages/darwin-x64/bin
-        mv svg-mcp packages/darwin-x64/bin/
+        mv temp/macos-x64/svg-mcp packages/darwin-x64/bin/
         chmod +x packages/darwin-x64/bin/svg-mcp
-        rm macos-x64.tar.gz
+        rm -rf temp/macos-x64 macos-x64.tar.gz
         
         # macOS ARM64
         echo "Downloading macOS ARM64..."
         curl -L "$BASE_URL/svg-mcp-macos-arm64.tar.gz" -o macos-arm64.tar.gz
-        tar -xzf macos-arm64.tar.gz
+        mkdir -p temp/macos-arm64
+        cd temp/macos-arm64
+        tar -xzf ../../macos-arm64.tar.gz
+        cd ../..
         mkdir -p packages/darwin-arm64/bin
-        mv svg-mcp packages/darwin-arm64/bin/
+        mv temp/macos-arm64/svg-mcp packages/darwin-arm64/bin/
         chmod +x packages/darwin-arm64/bin/svg-mcp
-        rm macos-arm64.tar.gz
+        rm -rf temp/macos-arm64 macos-arm64.tar.gz
         
         # 验证所有必要的文件都存在
         echo "Verifying platform packages..."
@@ -328,10 +340,19 @@ jobs:
               continue
             fi
             
+            # 显示文件内容以便调试
+            echo "📄 Contents of $pkg_dir/package.json:"
+            cat "$pkg_dir/package.json"
+            echo ""
+            
             # 检查JSON格式是否正确
-            if ! node -e "JSON.parse(require('fs').readFileSync('$pkg_dir/package.json', 'utf8'))"; then
+            if ! node -e "JSON.parse(require('fs').readFileSync('$pkg_dir/package.json', 'utf8'))" 2>/dev/null; then
               echo "❌ Invalid JSON in $pkg_dir/package.json"
-              cat "$pkg_dir/package.json"
+              echo "📄 Raw file content (with special characters visible):"
+              cat -A "$pkg_dir/package.json" || od -c "$pkg_dir/package.json"
+              echo ""
+              echo "📏 File size: $(wc -c < "$pkg_dir/package.json") bytes"
+              echo "📏 File lines: $(wc -l < "$pkg_dir/package.json") lines"
               continue
             fi
             
@@ -360,9 +381,18 @@ jobs:
               continue
             fi
             
-            # 检查JSON格式是否正确，如果不正确则跳过
+            echo "📄 Before update - Contents of $pkg_dir/package.json:"
+            cat "$pkg_dir/package.json"
+            echo ""
+            
+            # 检查JSON格式是否正确，如果不正确则显示详细信息
             if ! node -e "JSON.parse(require('fs').readFileSync('$pkg_dir/package.json', 'utf8'))" 2>/dev/null; then
               echo "⚠️ Skipping $pkg_name: invalid JSON in package.json"
+              echo "📄 Raw file content (with special characters visible):"
+              cat -A "$pkg_dir/package.json" || od -c "$pkg_dir/package.json"
+              echo ""
+              echo "📏 File size: $(wc -c < "$pkg_dir/package.json") bytes"
+              echo "📏 File lines: $(wc -l < "$pkg_dir/package.json") lines"
               continue
             fi
             
@@ -389,12 +419,19 @@ jobs:
               }
             "
             
+            echo "📄 After update - Contents of $pkg_dir/package.json:"
+            cat "$pkg_dir/package.json"
+            echo ""
+            
             # 再次验证JSON格式是否正确
             if node -e "JSON.parse(require('fs').readFileSync('$pkg_dir/package.json', 'utf8'))" 2>/dev/null; then
               echo "✅ Valid JSON in $pkg_dir/package.json"
             else
               echo "❌ Invalid JSON in $pkg_dir/package.json after update"
+              echo "📄 Raw file content after update:"
+              cat -A "$pkg_dir/package.json" || od -c "$pkg_dir/package.json"
             fi
+            echo "---"
           fi
         done
         
@@ -410,6 +447,7 @@ jobs:
         for pkg_dir in packages/*/; do
           if [ -d "$pkg_dir" ]; then
             pkg_name=$(basename "$pkg_dir")
+            echo "=== Processing $pkg_name package ==="
             
             # 检查是否有package.json
             if [ ! -f "$pkg_dir/package.json" ]; then
@@ -418,9 +456,17 @@ jobs:
               continue
             fi
             
+            echo "📄 Contents of $pkg_dir/package.json:"
+            cat "$pkg_dir/package.json"
+            echo ""
+            
             # 检查JSON格式
             if ! node -e "JSON.parse(require('fs').readFileSync('$pkg_dir/package.json', 'utf8'))" 2>/dev/null; then
               echo "⚠️ Skipping $pkg_name: invalid JSON in package.json"
+              echo "📄 Raw file content (with special characters visible):"
+              cat -A "$pkg_dir/package.json" || od -c "$pkg_dir/package.json"
+              echo ""
+              echo "📏 File size: $(wc -c < "$pkg_dir/package.json") bytes"
               failed_packages+=("$pkg_name (invalid JSON)")
               continue
             fi
@@ -429,6 +475,13 @@ jobs:
             if [ ! -f "$pkg_dir/index.js" ]; then
               echo "⚠️ Skipping $pkg_name: no index.js found"
               failed_packages+=("$pkg_name (no index.js)")
+              continue
+            fi
+            
+            # 检查是否有二进制文件
+            if [ ! -f "$pkg_dir/bin/svg-mcp"* ]; then
+              echo "⚠️ Skipping $pkg_name: no binary found in bin/"
+              failed_packages+=("$pkg_name (no binary)")
               continue
             fi
             
@@ -445,6 +498,7 @@ jobs:
               failed_packages+=("$package_name (publish failed)")
             fi
             cd ../..
+            echo ""
           fi
         done
         
