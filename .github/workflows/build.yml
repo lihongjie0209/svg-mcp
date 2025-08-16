@@ -274,6 +274,17 @@ jobs:
         
         echo "Downloading binaries for platform packages..."
         
+        # 备份所有现有的package.json文件
+        echo "Backing up existing package.json files..."
+        mkdir -p backup
+        for pkg_dir in packages/*/; do
+          if [ -f "$pkg_dir/package.json" ]; then
+            pkg_name=$(basename "$pkg_dir")
+            cp "$pkg_dir/package.json" "backup/$pkg_name-package.json"
+            echo "Backed up $pkg_dir/package.json"
+          fi
+        done
+        
         # Windows x64 MSVC
         echo "Downloading Windows x64..."
         curl -L "$BASE_URL/svg-mcp-windows-x64.zip" -o windows-x64.zip
@@ -281,6 +292,7 @@ jobs:
         cd temp/windows-x64
         unzip ../../windows-x64.zip
         cd ../..
+        # 只创建bin目录，不覆盖整个包目录
         mkdir -p packages/win32-x64/bin
         mv temp/windows-x64/svg-mcp.exe packages/win32-x64/bin/
         rm -rf temp/windows-x64 windows-x64.zip
@@ -292,6 +304,7 @@ jobs:
         cd temp/linux-x64
         tar -xzf ../../linux-x64.tar.gz
         cd ../..
+        # 只创建bin目录，不覆盖整个包目录
         mkdir -p packages/linux-x64/bin
         mv temp/linux-x64/svg-mcp packages/linux-x64/bin/
         chmod +x packages/linux-x64/bin/svg-mcp
@@ -304,6 +317,7 @@ jobs:
         cd temp/macos-x64
         tar -xzf ../../macos-x64.tar.gz
         cd ../..
+        # 只创建bin目录，不覆盖整个包目录
         mkdir -p packages/macos-x64/bin
         mv temp/macos-x64/svg-mcp packages/macos-x64/bin/
         chmod +x packages/macos-x64/bin/svg-mcp
@@ -316,10 +330,23 @@ jobs:
         cd temp/macos-arm64
         tar -xzf ../../macos-arm64.tar.gz
         cd ../..
+        # 只创建bin目录，不覆盖整个包目录
         mkdir -p packages/macos-arm64/bin
         mv temp/macos-arm64/svg-mcp packages/macos-arm64/bin/
         chmod +x packages/macos-arm64/bin/svg-mcp
         rm -rf temp/macos-arm64 macos-arm64.tar.gz
+        
+        # 恢复任何可能被覆盖的package.json文件
+        echo "Restoring package.json files if needed..."
+        for pkg_dir in packages/*/; do
+          pkg_name=$(basename "$pkg_dir")
+          if [ -f "backup/$pkg_name-package.json" ]; then
+            if [ ! -f "$pkg_dir/package.json" ] || [ ! -s "$pkg_dir/package.json" ]; then
+              echo "Restoring $pkg_dir/package.json from backup"
+              cp "backup/$pkg_name-package.json" "$pkg_dir/package.json"
+            fi
+          fi
+        done
         
         # 验证所有必要的文件都存在
         echo "Verifying platform packages..."
