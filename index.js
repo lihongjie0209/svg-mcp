@@ -10,7 +10,15 @@ const arch = process.arch;
 
 // 映射到我们的包名
 const getPlatformPackageName = (platform, arch) => {
-  return `@svg-mcp/${platform}-${arch}`;
+  // 映射 Node.js 平台名称到我们的包名
+  const platformMap = {
+    'win32': 'windows',
+    'darwin': 'macos',
+    'linux': 'linux'
+  };
+  
+  const mappedPlatform = platformMap[platform] || platform;
+  return `@svg-mcp/${mappedPlatform}-${arch}`;
 };
 
 function getBinaryPath() {
@@ -30,10 +38,10 @@ function getBinaryPath() {
   } catch (error) {
     // 如果平台包不可用，提供有用的错误信息
     const supportedPlatforms = [
-      'win32-x64 (Windows 64-bit)',
+      'windows-x64 (Windows 64-bit)',
       'linux-x64 (Linux 64-bit)', 
-      'darwin-x64 (macOS Intel)',
-      'darwin-arm64 (macOS Apple Silicon)'
+      'macos-x64 (macOS Intel)',
+      'macos-arm64 (macOS Apple Silicon)'
     ];
     
     throw new Error(
