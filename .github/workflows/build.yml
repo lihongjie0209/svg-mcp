@@ -112,6 +112,7 @@ jobs:
       actions: read
     
     steps:
+        retention-days: 1
     - name: Checkout code
       uses: actions/checkout@v4
       with:
